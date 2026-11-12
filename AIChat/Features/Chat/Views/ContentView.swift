@@ -1,21 +1,20 @@
-//
-//  ContentView.swift
-//  AI Chat
-//
-//  Created by Попов Павел on 12.11.2026.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @State private var viewModel: ChatViewModel
+
+    init() {
+        _viewModel = State(initialValue: ChatViewModel(
+            chat: Chat(),
+            provider: UnconfiguredAIProvider(),
+            repository: InMemoryChatRepository()
+        ))
+    }
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationStack {
+            ChatView(viewModel: viewModel)
         }
-        .padding()
     }
 }
 

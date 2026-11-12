@@ -24,4 +24,8 @@ final class Chat {
         self.updatedAt = updatedAt
         self.messages = messages
     }
+
+    var sortedMessages: [Message] {
+        messages.sorted { $0.createdAt < $1.createdAt }
+    }
 }

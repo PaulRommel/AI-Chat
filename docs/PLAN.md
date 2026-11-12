@@ -16,9 +16,9 @@
 | 01 | Анализ окружения и Git | PUSHED (отдельного коммита нет) | — | — |
 | 02 | Документация | PUSHED | bde10af | origin/main |
 | 03 | Структура проекта | PUSHED | 27b24cc | origin/main |
-| 04 | XcodeGen | IN PROGRESS (ожидает коммита и сборки на Mac) | — | — |
-| 05 | Архитектура и модели | NOT STARTED | — | — |
-| 06 | Главный экран | NOT STARTED | — | — |
+| 04 | XcodeGen | PUSHED | ff6fca2 | origin/main |
+| 05 | Архитектура и модели | PUSHED | 4873f02 | origin/main |
+| 06 | Главный экран | IN PROGRESS (ожидает сборки на Mac и коммита) | — | — |
 | 07 | Отображение сообщений | NOT STARTED | — | — |
 | 08 | Хранение данных | NOT STARTED | — | — |
 | 09 | История диалогов | NOT STARTED | — | — |
@@ -86,3 +86,25 @@
 - Правка `project.pbxproj` (18.6) откачена по решению владельца. Сгенерированный `.xcodeproj` убран из индекса (`git rm --cached`), на диске остаётся и скрыт `.gitignore`.
 - Не проверено агентом: `xcodegen generate` и `xcodebuild` требуют macOS. Пустая папка `AIChat/Tests` может дать предупреждение XcodeGen. Сборка под симулятор — на Mac владельца.
 - Иконка приложения: `AppIcon.appiconset` без изображения. Сборка может выдать предупреждение, это не блокер.
+
+## Этап 05 — сделано (ожидает сборки на Mac)
+
+- Модели SwiftData: `Chat` (id, title, createdAt, updatedAt, messages с каскадным удалением), `Message` (id, role, content, createdAt, status, chat).
+- Enum `MessageRole` (user, assistant, system), `MessageStatus` (pending, streaming, completed, partial, failed).
+- Протокол `AIProvider` и тип `ChatRequestMessage` (сеть не реализована, это этап 10).
+- `AIError` с понятными сообщениями (missingAPIKey, invalidAPIKey, rateLimited, offline, timeout, server, decoding, streamInterrupted, unknown).
+- Протокол `ChatRepository` (реализация на SwiftData — этап 08).
+- `AppState` (выбранный чат), `GenerationState` (idle, sending, streaming, failed).
+- ViewModel: `ChatViewModel` (черновик, состояние, `canSend`), `ChatListViewModel` (загрузка, создание, удаление через `ChatRepository`). Отправка сообщений — этап 11.
+- `Resources/Info.plist` создаётся XcodeGen при генерации. Его нужно включить в коммит этапа.
+
+## Этап 06 — сделано (ожидает сборки на Mac)
+
+- `ContentView` теперь показывает `ChatView` в `NavigationStack`, вместо шаблона «Hello, world!».
+- `ChatView`: заголовок чата, список сообщений или пустой экран, поле ввода внизу.
+- `EmptyChatView`: пустой экран нового диалога.
+- `MessageView`: пузыри пользователя и ассистента (без Markdown, это этап 07).
+- `MessageInputView`: многострочное поле и кнопка отправки. Кнопка неактивна, пока не передан обработчик (`onSend: nil`). Отправка подключается на этапе 11.
+- Временные заглушки, обе заменяются позже: `UnconfiguredAIProvider` (сразу возвращает `missingAPIKey`, до этапа 10) и `InMemoryChatRepository` (данные в памяти, до SwiftData на этапе 08).
+- `.gitignore`: `AIChat/Resources/Info.plist` исключён, так как XcodeGen создаёт его заново.
+- Не проверено агентом: сборка и визуальный вид на симуляторе, проверка клавиатуры — на Mac владельца.
