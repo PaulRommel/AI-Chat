@@ -23,6 +23,11 @@ targets:
         excludes:
           - Tests/**
           - Resources/Info.plist
+    preBuildScripts:
+      - name: Generate secrets
+        script: |
+          /usr/bin/env python3 "${SRCROOT}/scripts/generate_secrets.py" "${SRCROOT}"
+        basedOnDependencyAnalysis: false
     info:
       path: AIChat/Resources/Info.plist
       properties:

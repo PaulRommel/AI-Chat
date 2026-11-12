@@ -77,7 +77,7 @@ struct ContentView: View {
         guard let repository else { return }
         chatViewModel = ChatViewModel(
             chat: chat,
-            provider: UnconfiguredAIProvider(),
+            provider: AIService(),
             repository: repository
         )
     }
