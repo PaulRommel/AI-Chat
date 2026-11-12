@@ -2,8 +2,8 @@ import SwiftUI
 
 struct MessageInputView: View {
     @Binding var text: String
-    /// nil — отправка недоступна. Подключается на этапе 11.
-    let onSend: (() -> Void)?
+    let isSendEnabled: Bool
+    let onSend: () -> Void
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 8) {
@@ -17,20 +17,16 @@ struct MessageInputView: View {
                 )
 
             Button {
-                onSend?()
+                onSend()
             } label: {
                 Image(systemName: "arrow.up.circle.fill")
                     .font(.system(size: 32))
             }
-            .disabled(!canSubmit)
+            .disabled(!isSendEnabled)
             .accessibilityLabel("Отправить")
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
         .background(.bar)
-    }
-
-    private var canSubmit: Bool {
-        onSend != nil && !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }

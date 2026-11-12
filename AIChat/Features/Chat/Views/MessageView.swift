@@ -18,8 +18,13 @@ struct MessageView: View {
                     )
             }
         case .assistant, .system:
-            MarkdownView(source: message.content)
-                .textSelection(.enabled)
+            if message.content.isEmpty && message.status == .pending {
+                ProgressView()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                MarkdownView(source: message.content)
+                    .textSelection(.enabled)
+            }
         }
     }
 }

@@ -12,7 +12,19 @@ struct ChatView: View {
             } else {
                 messageList(messages)
             }
-            MessageInputView(text: $viewModel.draft, onSend: nil)
+            if case .failed(let message) = viewModel.state {
+                Text(message)
+                    .font(.footnote)
+                    .foregroundStyle(.red)
+                    .padding(.horizontal)
+                    .padding(.top, 4)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            MessageInputView(
+                text: $viewModel.draft,
+                isSendEnabled: viewModel.canSend,
+                onSend: viewModel.send
+            )
         }
         .navigationTitle(viewModel.chat.title)
         .navigationBarTitleDisplayMode(.inline)
