@@ -1,0 +1,61 @@
+name: AI Chat
+options:
+  bundleIdPrefix: Swift-Rabbit
+  createIntermediateGroups: true
+  deploymentTarget:
+    iOS: "18.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    GENERATE_INFOPLIST_FILE: NO
+targets:
+  AI Chat:
+    type: application
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: AIChat
+        excludes:
+          - Tests/**
+          - Resources/Info.plist
+    info:
+      path: AIChat/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: AI Chat
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: Swift-Rabbit.AI-Chat
+        PRODUCT_NAME: AI Chat
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+  AIChatTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: AIChat/Tests
+    dependencies:
+      - target: AI Chat
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: Swift-Rabbit.AI-Chat.Tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/AI Chat.app/AI Chat"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+schemes:
+  AI Chat:
+    build:
+      targets:
+        AI Chat: all
+        AIChatTests: [test]
+    test:
+      targets:
+        - AIChatTests

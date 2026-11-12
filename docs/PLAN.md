@@ -13,10 +13,10 @@
 
 | Этап | Название | Статус | Commit | Push |
 |---|---|---|---|---|
-| 01 | Анализ окружения и Git | IN PROGRESS (ожидает коммита владельца) | — | — |
-| 02 | Документация | IN PROGRESS (ожидает коммита владельца) | — | — |
-| 03 | Структура проекта | IN PROGRESS (ожидает коммита владельца) | — | — |
-| 04 | XcodeGen | NOT STARTED | — | — |
+| 01 | Анализ окружения и Git | PUSHED (отдельного коммита нет) | — | — |
+| 02 | Документация | PUSHED | bde10af | origin/main |
+| 03 | Структура проекта | PUSHED | 27b24cc | origin/main |
+| 04 | XcodeGen | IN PROGRESS (ожидает коммита и сборки на Mac) | — | — |
 | 05 | Архитектура и модели | NOT STARTED | — | — |
 | 06 | Главный экран | NOT STARTED | — | — |
 | 07 | Отображение сообщений | NOT STARTED | — | — |
@@ -78,3 +78,11 @@
 - Ключ в коде — только в обфусцированном виде, в git и README не попадает.
 - Ключ, переданный в переписке, перевыпустить после сдачи. Факт отметить в README.
 - Реализация — этап 10.
+
+## Этап 04 — сделано (ожидает сборки на Mac)
+
+- `project.yml`: deployment target iOS 18.0 (проект и оба target), bundle ID `Swift-Rabbit.AI-Chat`, `TARGETED_DEVICE_FAMILY` = 1 (iPhone), `SWIFT_STRICT_CONCURRENCY: complete`, Info.plist генерируется в `AIChat/Resources/Info.plist`.
+- Target `AI Chat` (application) и `AIChatTests` (unit-test, host — `AI Chat`). Схема `AI Chat`.
+- Правка `project.pbxproj` (18.6) откачена по решению владельца. Сгенерированный `.xcodeproj` убран из индекса (`git rm --cached`), на диске остаётся и скрыт `.gitignore`.
+- Не проверено агентом: `xcodegen generate` и `xcodebuild` требуют macOS. Пустая папка `AIChat/Tests` может дать предупреждение XcodeGen. Сборка под симулятор — на Mac владельца.
+- Иконка приложения: `AppIcon.appiconset` без изображения. Сборка может выдать предупреждение, это не блокер.
