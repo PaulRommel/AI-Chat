@@ -13,7 +13,7 @@ final class Chat {
 
     init(
         id: UUID = UUID(),
-        title: String = "Новый чат",
+        title: String = Chat.defaultTitle,
         createdAt: Date = .now,
         updatedAt: Date = .now,
         messages: [Message] = []

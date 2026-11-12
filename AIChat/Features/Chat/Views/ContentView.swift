@@ -3,49 +3,116 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @State private var viewModel: ChatViewModel?
-    @State private var errorMessage: String?
+    @State private var repository: SwiftDataChatRepository?
+    @State private var listViewModel: ChatListViewModel?
+    @State private var chatViewModel: ChatViewModel?
+    @State private var isShowingHistory = false
+    @State private var isShowingError = false
+    @State private var errorMessage = ""
 
     var body: some View {
         NavigationStack {
-            if let viewModel {
-                ChatView(viewModel: viewModel)
-            } else if let errorMessage {
-                ContentUnavailableView(
-                    "Не удалось открыть чат",
-                    systemImage: "exclamationmark.triangle",
-                    description: Text(errorMessage)
-                )
-            } else {
-                ProgressView()
+            Group {
+                if let chatViewModel {
+                    ChatView(viewModel: chatViewModel)
+                } else if listViewModel != nil {
+                    NoChatView(onNewChat: startNewChat)
+                } else {
+                    ProgressView()
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        isShowingHistory = true
+                    } label: {
+                        Image(systemName: "list.bullet")
+                    }
+                    .accessibilityLabel("История чатов")
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        startNewChat()
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                    }
+                    .accessibilityLabel("Новый чат")
+                }
             }
         }
+        .sheet(isPresented: $isShowingHistory) {
+            if let listViewModel {
+                HistoryView(
+                    viewModel: listViewModel,
+                    selectedChatID: chatViewModel?.chat.id,
+                    onSelect: { chat in open(chat) },
+                    onDelete: { chat in delete(chat) }
+                )
+            }
+        }
+        .alert("Ошибка", isPresented: $isShowingError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(errorMessage)
+        }
         .task {
-            guard viewModel == nil else { return }
-            openLatestChat()
+            guard listViewModel == nil else { return }
+            setUp()
         }
     }
 
-    /// Открывает последний сохранённый чат. Если чатов ещё нет, создаёт первый.
-    private func openLatestChat() {
-        let repository = SwiftDataChatRepository(context: modelContext)
+    /// Открывает последний чат. Если чатов нет, показывает пустой экран.
+    private func setUp() {
+        let repo = SwiftDataChatRepository(context: modelContext)
+        let list = ChatListViewModel(repository: repo)
+        repository = repo
+        listViewModel = list
+        list.load()
+        if let latest = list.chats.first {
+            open(latest)
+        }
+    }
+
+    private func open(_ chat: Chat) {
+        guard let repository else { return }
+        chatViewModel = ChatViewModel(
+            chat: chat,
+            provider: UnconfiguredAIProvider(),
+            repository: repository
+        )
+    }
+
+    /// Каждое нажатие создаёт новый чат и открывает его.
+    private func startNewChat() {
+        guard let listViewModel else { return }
         do {
-            let chat = try repository.fetchChats().first ?? createChat(in: repository)
-            viewModel = ChatViewModel(
-                chat: chat,
-                provider: UnconfiguredAIProvider(),
-                repository: repository
-            )
+            let chat = try listViewModel.createChat()
+            open(chat)
         } catch {
-            errorMessage = "Попробуйте перезапустить приложение."
+            show("Не удалось создать чат.")
         }
     }
 
-    private func createChat(in repository: ChatRepository) throws -> Chat {
-        let chat = Chat()
-        repository.insert(chat)
-        try repository.save()
-        return chat
+    /// Удаляет чат. Если удалён открытый, открывается следующий; если чатов не осталось, показывается пустой экран.
+    private func delete(_ chat: Chat) {
+        guard let listViewModel else { return }
+        let wasOpen = chatViewModel?.chat.id == chat.id
+        do {
+            try listViewModel.delete(chat)
+        } catch {
+            show("Не удалось удалить чат.")
+            return
+        }
+        guard wasOpen else { return }
+        chatViewModel = nil
+        if let next = listViewModel.chats.first {
+            open(next)
+        }
+    }
+
+    private func show(_ message: String) {
+        errorMessage = message
+        isShowingError = true
     }
 }
 
