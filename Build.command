@@ -9,7 +9,8 @@ PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_DIR" || exit 1
 
 SCHEME="AI Chat"
-DERIVED_DATA="$PROJECT_DIR/build"
+# Вне папки проекта: в Documents (iCloud) к .app добавляются метаданные Finder, и codesign их отвергает.
+DERIVED_DATA="$HOME/Library/Developer/AIChatBuild"
 APP_NAME="AI Chat.app"
 
 finish() {
