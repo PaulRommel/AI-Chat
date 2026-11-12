@@ -10,7 +10,7 @@ final class ChatListViewModelTests: XCTestCase {
         let first = try list.createChat()
         let second = try list.createChat()
 
-        XCTAssertEqual(list.chats.map(\.id), [second.id, first.id])
+        XCTAssertEqual(list.chats.map { $0.id }, [second.id, first.id])
         XCTAssertEqual(try store.repository.fetchChats().count, 2)
     }
 
@@ -24,7 +24,7 @@ final class ChatListViewModelTests: XCTestCase {
 
         list.load()
 
-        XCTAssertEqual(list.chats.map(\.id), [newer.id, older.id])
+        XCTAssertEqual(list.chats.map { $0.id }, [newer.id, older.id])
         XCTAssertNil(list.loadError)
     }
 

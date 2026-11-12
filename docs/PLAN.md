@@ -29,7 +29,7 @@
 | 14 | Ошибки и повтор | PUSHED | 6f4e662 | origin/main |
 | 15 | Темы оформления | PUSHED | 542db3d | origin/main |
 | 16 | Полировка интерфейса | PUSHED | 591481c | origin/main |
-| 17 | Unit Tests | TESTING (ожидает запуска на Mac и коммита) | — | — |
+| 17 | Unit Tests | PUSHED | e305a8f | origin/main |
 | 18 | Build.command | NOT STARTED | — | — |
 | 19 | Документация и AI Logs | NOT STARTED | — | — |
 | 20 | Финальный аудит | NOT STARTED | — | — |
