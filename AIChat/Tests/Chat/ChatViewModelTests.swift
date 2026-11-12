@@ -16,7 +16,7 @@ final class ChatViewModelTests: XCTestCase {
         try await waitUntil { viewModel.state == .idle }
 
         let messages = chat.sortedMessages
-        XCTAssertEqual(messages.map(\.role), [.user, .assistant])
+        XCTAssertEqual(messages.map { $0.role }, [.user, .assistant])
         XCTAssertEqual(messages[0].content, "Привет")
         XCTAssertEqual(messages[1].content, "Привет, мир")
         XCTAssertEqual(messages[1].status, .completed)
