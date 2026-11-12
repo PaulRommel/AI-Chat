@@ -23,7 +23,9 @@ struct ChatView: View {
             MessageInputView(
                 text: $viewModel.draft,
                 isSendEnabled: viewModel.canSend,
-                onSend: viewModel.send
+                isGenerating: viewModel.state.isBusy,
+                onSend: viewModel.send,
+                onStop: viewModel.stop
             )
         }
         .navigationTitle(viewModel.chat.title)

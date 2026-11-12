@@ -18,9 +18,11 @@ struct MessageView: View {
                     )
             }
         case .assistant, .system:
-            if message.content.isEmpty && message.status == .pending {
-                ProgressView()
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            if message.content.isEmpty {
+                if message.status == .pending || message.status == .streaming {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
             } else {
                 MarkdownView(source: message.content)
                     .textSelection(.enabled)

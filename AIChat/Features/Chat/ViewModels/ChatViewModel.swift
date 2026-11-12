@@ -66,6 +66,11 @@ final class ChatViewModel {
         }
     }
 
+    /// Останавливает генерацию. Уже полученная часть ответа сохраняется со статусом `partial`.
+    func stop() {
+        generationTask?.cancel()
+    }
+
     private func consume(_ stream: AsyncThrowingStream<String, Error>, into message: Message) async {
         message.status = .streaming
         state = .streaming
@@ -80,7 +85,8 @@ final class ChatViewModel {
                     lastSave = .now
                 }
             }
-            message.status = .completed
+            // Отмена завершает поток без ошибки, поэтому статус проверяется отдельно.
+            message.status = Task.isCancelled ? .partial : .completed
         } catch is CancellationError {
             message.status = .partial
         } catch {
