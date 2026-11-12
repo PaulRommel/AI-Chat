@@ -30,8 +30,8 @@
 | 15 | Темы оформления | PUSHED | 542db3d | origin/main |
 | 16 | Полировка интерфейса | PUSHED | 591481c | origin/main |
 | 17 | Unit Tests | PUSHED | e305a8f | origin/main |
-| 18 | Build.command | DONE (ждёт коммита) | — | — |
-| 19 | Документация и AI Logs | NOT STARTED | — | — |
+| 18 | Build.command | PUSHED | fec4d8d | origin/main |
+| 19 | Документация и AI Logs | PUSHED | f2d32a1 | origin/main |
 | 20 | Финальный аудит | NOT STARTED | — | — |
 
 Статусы: NOT STARTED, IN PROGRESS, TESTING, COMMITTED, PUSHED, BLOCKED.

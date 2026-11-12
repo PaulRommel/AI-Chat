@@ -31,11 +31,14 @@ def main() -> int:
     env = read_env(root / ".env")
     api_key = env.get("OPENROUTER_API_KEY", "")
     model = (env.get("OPENROUTER_MODEL") or "openrouter/free").replace('"', "")
+    output = root / "AIChat" / "Core" / "Networking" / "Generated" / "GeneratedSecrets.swift"
+    if not api_key and output.exists():
+        print("warning: OPENROUTER_API_KEY пуст или .env не найден. Прежний GeneratedSecrets.swift сохранён.", file=sys.stderr)
+        return 0
 
     mask = secrets.token_bytes(32)
     obfuscated = bytes(b ^ mask[i % len(mask)] for i, b in enumerate(api_key.encode("utf-8")))
 
-    output = root / "AIChat" / "Core" / "Networking" / "Generated" / "GeneratedSecrets.swift"
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
         "// Сгенерировано scripts/generate_secrets.py из .env. Не редактировать. Не попадает в git.\n"
