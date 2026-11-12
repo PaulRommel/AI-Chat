@@ -72,7 +72,8 @@ struct MarkdownView: View {
         for (index, part) in parts.enumerated() {
             if index % 2 == 1 && index < parts.count - 1 {
                 var code = AttributedString(part)
-                code.font = .system(.body, design: .monospaced)
+                // Доступ по типу атрибута, а не через динамический key path: так код безопасен в Swift 6.
+                code[AttributeScopes.SwiftUIAttributes.FontAttribute.self] = .system(.body, design: .monospaced)
                 result += code
             } else {
                 result += formatted(part)
