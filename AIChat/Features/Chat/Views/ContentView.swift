@@ -3,10 +3,12 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(ThemeManager.self) private var themeManager
     @State private var repository: SwiftDataChatRepository?
     @State private var listViewModel: ChatListViewModel?
     @State private var chatViewModel: ChatViewModel?
     @State private var isShowingHistory = false
+    @State private var isShowingSettings = false
     @State private var isShowingError = false
     @State private var errorMessage = ""
 
@@ -30,6 +32,14 @@ struct ContentView: View {
                     }
                     .accessibilityLabel("История чатов")
                 }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        isShowingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                    .accessibilityLabel("Настройки")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         startNewChat()
@@ -39,6 +49,10 @@ struct ContentView: View {
                     .accessibilityLabel("Новый чат")
                 }
             }
+        }
+        .preferredColorScheme(themeManager.theme.colorScheme)
+        .sheet(isPresented: $isShowingSettings) {
+            SettingsView()
         }
         .sheet(isPresented: $isShowingHistory) {
             if let listViewModel {
@@ -118,5 +132,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environment(ThemeManager())
         .modelContainer(for: [Chat.self, Message.self], inMemory: true)
 }

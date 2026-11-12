@@ -4,6 +4,7 @@ import SwiftData
 @main
 struct AIChatApp: App {
     private let container: ModelContainer
+    @State private var themeManager = ThemeManager()
 
     init() {
         do {
@@ -16,6 +17,7 @@ struct AIChatApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(themeManager)
         }
         .modelContainer(container)
     }
