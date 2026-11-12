@@ -28,8 +28,8 @@
 | 13 | Остановка генерации | PUSHED | 2ad6a1c | origin/main |
 | 14 | Ошибки и повтор | PUSHED | 6f4e662 | origin/main |
 | 15 | Темы оформления | PUSHED | 542db3d | origin/main |
-| 16 | Полировка интерфейса | TESTING (ожидает сборки и проверки на Mac и коммита) | — | — |
-| 17 | Unit Tests | NOT STARTED | — | — |
+| 16 | Полировка интерфейса | PUSHED | 591481c | origin/main |
+| 17 | Unit Tests | TESTING (ожидает запуска на Mac и коммита) | — | — |
 | 18 | Build.command | NOT STARTED | — | — |
 | 19 | Документация и AI Logs | NOT STARTED | — | — |
 | 20 | Финальный аудит | NOT STARTED | — | — |
@@ -202,3 +202,13 @@
 - Markdown: заголовок без текста (например, `####`) не выводится.
 - Unit-тесты разбора Markdown: `AIChatTests/Utilities/MarkdownBlockParserTests`.
 - Ограничение: таблицы Markdown и вложенные списки не поддерживаются. Выводятся как текст.
+
+## Этап 17 — сделано (ожидает запуска на Mac)
+
+- `Tests/Support/TestDoubles.swift`: `FakeProvider` (сценарии: фрагменты, ошибка, ожидание отмены), `TestStore` (SwiftData в памяти), `waitUntil`.
+- `ChatViewModelTests`: отправка и сохранение, история запроса, пустой черновик, ошибка и повтор без дублей, ошибка сервера, остановка с частичным ответом.
+- `ChatListViewModelTests`: создание, сортировка, удаление.
+- `ThemeManagerTests`: тема по умолчанию, сохранение между запусками, соответствие `ColorScheme`.
+- `AIServiceTests` через `MockURLProtocol`: разбор SSE, заголовки и тело запроса, коды 401/429/500, отсутствие ключа, сеть, ошибка в потоке. Без реального ключа и сети.
+- `APIConfigurationTests`: восстановление обфусцированного ключа.
+- Ранее написанные `StreamingParserTests` и `MarkdownBlockParserTests` остаются.
