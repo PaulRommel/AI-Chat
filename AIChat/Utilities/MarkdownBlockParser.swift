@@ -6,6 +6,7 @@ enum MarkdownBlock: Equatable {
     case bullet(String)
     case numbered(number: String, text: String)
     case code(language: String?, text: String)
+    case divider
 }
 
 /// Разбор Markdown на блоки. Строчная разметка (жирный, курсив, код) обрабатывается при отображении.
@@ -49,6 +50,9 @@ enum MarkdownBlockParser {
 
             if trimmed.isEmpty {
                 flushParagraph()
+            } else if isEmptyHeading(trimmed) {
+                // Заголовок без текста (например, «####») не выводится.
+                flushParagraph()
             } else if let block = blockStructure(trimmed) {
                 flushParagraph()
                 blocks.append(block)
@@ -65,7 +69,18 @@ enum MarkdownBlockParser {
     }
 
     private static func blockStructure(_ line: String) -> MarkdownBlock? {
-        heading(line) ?? bullet(line) ?? numbered(line)
+        divider(line) ?? heading(line) ?? bullet(line) ?? numbered(line)
+    }
+
+    private static func isEmptyHeading(_ line: String) -> Bool {
+        !line.isEmpty && line.allSatisfy { $0 == "#" }
+    }
+
+    /// Горизонтальная линия: три и больше одинаковых знака `-`, `*` или `_`, возможно через пробелы.
+    private static func divider(_ line: String) -> MarkdownBlock? {
+        let compact = line.filter { !$0.isWhitespace }
+        guard compact.count >= 3, let first = compact.first, "-*_".contains(first) else { return nil }
+        return compact.allSatisfy({ $0 == first }) ? .divider : nil
     }
 
     private static func heading(_ line: String) -> MarkdownBlock? {

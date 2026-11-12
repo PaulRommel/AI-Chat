@@ -34,6 +34,9 @@ struct MarkdownView: View {
                 Text("\(number).").monospacedDigit()
                 inlineText(text)
             }
+        case .divider:
+            Divider()
+                .padding(.vertical, 4)
         case .code(_, let text):
             ScrollView(.horizontal) {
                 Text(text)
