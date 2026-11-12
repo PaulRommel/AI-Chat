@@ -1,0 +1,13 @@
+# Xcode / generated
+DerivedData/
+build/
+*.xcodeproj/
+xcuserdata/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+.DS_Store
+
+# Local secrets: API key must never be committed
+.env
+Secrets.xcconfig
+*.key
