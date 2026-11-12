@@ -8,6 +8,10 @@ final class ChatViewModel {
     var draft: String = ""
     private(set) var state: GenerationState = .idle
 
+    /// Как часто ответ сохраняется во время потока. Меньше — надёжнее, больше — дешевле по записи.
+    private static let saveInterval: TimeInterval = 1
+    private static let saveFailedMessage = "Не удалось сохранить сообщение."
+
     private let provider: AIProvider
     private let repository: ChatRepository
     private var generationTask: Task<Void, Never>?
@@ -51,6 +55,7 @@ final class ChatViewModel {
 
         guard saveChanges() else {
             draft = text
+            state = .failed(message: Self.saveFailedMessage)
             return
         }
 
@@ -64,31 +69,37 @@ final class ChatViewModel {
     private func consume(_ stream: AsyncThrowingStream<String, Error>, into message: Message) async {
         message.status = .streaming
         state = .streaming
+        var lastSave = Date.now
+        var outcome: GenerationState = .idle
         do {
             for try await fragment in stream {
                 message.content += fragment
+                if Date.now.timeIntervalSince(lastSave) >= Self.saveInterval {
+                    // Ошибка промежуточного сохранения не прерывает поток: финальное сохранение повторит запись и сообщит об ошибке.
+                    _ = saveChanges()
+                    lastSave = .now
+                }
             }
             message.status = .completed
-            state = .idle
         } catch is CancellationError {
             message.status = .partial
-            state = .idle
         } catch {
             message.status = .failed
-            state = .failed(message: Self.userMessage(for: error))
+            outcome = .failed(message: Self.userMessage(for: error))
         }
         chat.updatedAt = .now
-        saveChanges()
+        if !saveChanges() {
+            outcome = .failed(message: Self.saveFailedMessage)
+        }
+        state = outcome
         generationTask = nil
     }
 
-    @discardableResult
     private func saveChanges() -> Bool {
         do {
             try repository.save()
             return true
         } catch {
-            state = .failed(message: "Не удалось сохранить сообщение.")
             return false
         }
     }
