@@ -4,22 +4,22 @@ struct MessageView: View {
     let message: Message
 
     var body: some View {
-        HStack {
-            if message.role == .user {
+        switch message.role {
+        case .user:
+            HStack {
                 Spacer(minLength: 48)
+                Text(message.content)
+                    .textSelection(.enabled)
+                    .foregroundStyle(.white)
+                    .padding(12)
+                    .background(
+                        Color.accentColor,
+                        in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    )
             }
-            Text(message.content)
+        case .assistant, .system:
+            MarkdownView(source: message.content)
                 .textSelection(.enabled)
-                .padding(12)
-                .foregroundStyle(message.role == .user ? Color.white : Color.primary)
-                .background(bubbleColor, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-            if message.role != .user {
-                Spacer(minLength: 48)
-            }
         }
-    }
-
-    private var bubbleColor: Color {
-        message.role == .user ? Color.accentColor : Color(.secondarySystemBackground)
     }
 }

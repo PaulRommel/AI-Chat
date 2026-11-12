@@ -2,13 +2,15 @@ import SwiftUI
 
 struct ChatView: View {
     @Bindable var viewModel: ChatViewModel
+    private let bottomID = "chat-bottom"
 
     var body: some View {
+        let messages = viewModel.chat.sortedMessages
         VStack(spacing: 0) {
-            if viewModel.chat.sortedMessages.isEmpty {
+            if messages.isEmpty {
                 EmptyChatView()
             } else {
-                messageList
+                messageList(messages)
             }
             MessageInputView(text: $viewModel.draft, onSend: nil)
         }
@@ -17,14 +19,33 @@ struct ChatView: View {
         .background(Color(.systemBackground))
     }
 
-    private var messageList: some View {
-        ScrollView {
-            LazyVStack(spacing: 12) {
-                ForEach(viewModel.chat.sortedMessages) { message in
-                    MessageView(message: message)
+    private func messageList(_ messages: [Message]) -> some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(spacing: 12) {
+                    ForEach(messages) { message in
+                        MessageView(message: message)
+                    }
+                    Color.clear
+                        .frame(height: 1)
+                        .id(bottomID)
                 }
+                .padding()
             }
-            .padding()
+            .defaultScrollAnchor(.bottom)
+            .scrollDismissesKeyboard(.interactively)
+            .onChange(of: messages.count) { _, _ in
+                scrollToBottom(proxy)
+            }
+            .onChange(of: messages.last?.content) { _, _ in
+                scrollToBottom(proxy)
+            }
+        }
+    }
+
+    private func scrollToBottom(_ proxy: ScrollViewProxy) {
+        withAnimation(.easeOut(duration: 0.2)) {
+            proxy.scrollTo(bottomID, anchor: .bottom)
         }
     }
 }
