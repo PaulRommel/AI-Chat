@@ -32,7 +32,7 @@
 | 17 | Unit Tests | PUSHED | e305a8f | origin/main |
 | 18 | Build.command | PUSHED | fec4d8d | origin/main |
 | 19 | Документация и AI Logs | PUSHED | f2d32a1 | origin/main |
-| 20 | Финальный аудит | NOT STARTED | — | — |
+| 20 | Финальный аудит | IN PROGRESS (сборка и тесты 31/31 ок, ждёт архива) | 114d61f | origin/main |
 
 Статусы: NOT STARTED, IN PROGRESS, TESTING, COMMITTED, PUSHED, BLOCKED.
 
