@@ -26,6 +26,30 @@ final class ChatViewModel {
         !state.isBusy && !trimmedDraft.isEmpty
     }
 
+    /// Текст ошибки последней генерации. Пропадает после перезапуска приложения.
+    var errorMessage: String? {
+        if case .failed(let message) = state {
+            message
+        } else {
+            nil
+        }
+    }
+
+    /// Повтор доступен, если последнее сообщение чата — неудачный ответ ассистента и генерация не идёт.
+    /// Проверка идёт по данным чата, поэтому кнопка сохраняется и после перезапуска приложения.
+    var canRetry: Bool {
+        !state.isBusy && lastFailedAssistant != nil
+    }
+
+    private var lastFailedAssistant: Message? {
+        guard let last = chat.sortedMessages.last,
+              last.role == .assistant,
+              last.status == .failed else {
+            return nil
+        }
+        return last
+    }
+
     private var trimmedDraft: String {
         draft.trimmingCharacters(in: .whitespacesAndNewlines)
     }
@@ -48,27 +72,41 @@ final class ChatViewModel {
         chat.adoptTitleIfNeeded(fromFirstMessage: text)
         chat.updatedAt = .now
 
-        // История берётся до ответа: в неё входят только завершённые сообщения, без пустого ответа.
-        let history = chat.sortedMessages
-            .filter { $0.id != assistantMessage.id && $0.status == .completed }
-            .map { ChatRequestMessage(role: $0.role, content: $0.content) }
-
+        let history = requestHistory(excluding: assistantMessage)
         guard saveChanges() else {
             draft = text
             state = .failed(message: Self.saveFailedMessage)
             return
         }
+        startGeneration(into: assistantMessage, history: history)
+    }
 
-        state = .sending
-        let stream = provider.streamReply(to: history)
-        generationTask = Task {
-            await consume(stream, into: assistantMessage)
-        }
+    /// Повторяет последний неудачный запрос в том же сообщении ассистента.
+    func retry() {
+        guard canRetry, let message = lastFailedAssistant else { return }
+        message.content = ""
+        message.status = .pending
+        startGeneration(into: message, history: requestHistory(excluding: message))
     }
 
     /// Останавливает генерацию. Уже полученная часть ответа сохраняется со статусом `partial`.
     func stop() {
         generationTask?.cancel()
+    }
+
+    private func requestHistory(excluding message: Message) -> [ChatRequestMessage] {
+        // В историю входят только завершённые сообщения: пустые и неудачные ответы пропускаются.
+        chat.sortedMessages
+            .filter { $0.id != message.id && $0.status == .completed }
+            .map { ChatRequestMessage(role: $0.role, content: $0.content) }
+    }
+
+    private func startGeneration(into message: Message, history: [ChatRequestMessage]) {
+        state = .sending
+        let stream = provider.streamReply(to: history)
+        generationTask = Task {
+            await consume(stream, into: message)
+        }
     }
 
     private func consume(_ stream: AsyncThrowingStream<String, Error>, into message: Message) async {

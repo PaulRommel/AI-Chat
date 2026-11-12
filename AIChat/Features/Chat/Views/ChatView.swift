@@ -12,7 +12,18 @@ struct ChatView: View {
             } else {
                 messageList(messages)
             }
-            if case .failed(let message) = viewModel.state {
+            if viewModel.canRetry {
+                HStack(spacing: 12) {
+                    Text(viewModel.errorMessage ?? "Ответ не получен.")
+                        .font(.footnote)
+                        .foregroundStyle(.red)
+                    Spacer()
+                    Button("Повторить", action: viewModel.retry)
+                        .font(.footnote.weight(.semibold))
+                }
+                .padding(.horizontal)
+                .padding(.top, 4)
+            } else if let message = viewModel.errorMessage {
                 Text(message)
                     .font(.footnote)
                     .foregroundStyle(.red)

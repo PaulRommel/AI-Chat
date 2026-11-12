@@ -19,9 +19,16 @@ struct MessageView: View {
             }
         case .assistant, .system:
             if message.content.isEmpty {
-                if message.status == .pending || message.status == .streaming {
+                switch message.status {
+                case .pending, .streaming:
                     ProgressView()
                         .frame(maxWidth: .infinity, alignment: .leading)
+                case .failed:
+                    Text("Ответ не получен.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                case .completed, .partial:
+                    EmptyView()
                 }
             } else {
                 MarkdownView(source: message.content)
